@@ -9,6 +9,7 @@ LANGUAGES = {
     "de": {
         "page_title": "Lidl Kassenbons Dashboard",
         "title": "Lidl+ Dashboard",
+        "language_selector": "🌐 Sprache",
         "filter_header": "Nach Datum filtern",
         "start_date": "Startdatum",
         "end_date": "Enddatum",
@@ -62,6 +63,7 @@ LANGUAGES = {
     "nl": {
         "page_title": "Lidl Kassabonnen Dashboard",
         "title": "Lidl+ Dashboard",
+        "language_selector": "🌐 Taal",
         "filter_header": "Filter op datum",
         "start_date": "Startdatum",
         "end_date": "Einddatum",
@@ -114,17 +116,53 @@ LANGUAGES = {
     }
 }
 
-# --- Language Selection ---
-if 'language' not in st.session_state:
-    st.title("Select Language / Sprache wählen")
-    lang_choice = st.selectbox("Choose your language:", ("Deutsch", "Nederlands"))
-    if st.button("Start Dashboard"):
-        st.session_state.language = "de" if lang_choice == "Deutsch" else "nl"
-        st.rerun()
-    st.stop()
+# --- Language Selection & State Management ---
+# 1. Check if language is in the URL query parameters
+if "lang" in st.query_params:
+    if st.query_params["lang"] in ["de", "nl"]:
+        st.session_state.language = st.query_params["lang"]
+
+# 2. Set default language if nothing is set
+if "language" not in st.session_state:
+    st.session_state.language = "de"
 
 LANG = st.session_state.language
 T = LANGUAGES[LANG]
+
+# --- Streamlit Dashboard Layout Setup ---
+# Hardcoded to always say "Lidl+ Dashboard" in the browser tab
+st.set_page_config(layout="wide", page_title="Lidl+ Dashboard", page_icon="🛒")
+
+# Custom CSS for better styling and fixing sidebar whitespace
+st.markdown("""
+<style>
+.main .block-container {padding-top: 2rem;}
+[data-testid="stSidebarUserContent"] {padding-top: 0rem;}
+.metric-card {background-color: #f0f2f6; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #1f77b4;}
+</style>
+""", unsafe_allow_html=True)
+
+# --- Language Toggle in Sidebar ---
+st.sidebar.markdown(f"### {T['language_selector']}")
+new_lang_choice = st.sidebar.radio(
+    label="Language",
+    options=["Deutsch", "Nederlands"],
+    index=0 if LANG == "de" else 1,
+    horizontal=True,
+    label_visibility="collapsed"
+)
+
+new_lang_code = "de" if new_lang_choice == "Deutsch" else "nl"
+
+# If the user changed the toggle, update state, URL, and reload
+if new_lang_code != LANG:
+    st.session_state.language = new_lang_code
+    st.query_params["lang"] = new_lang_code
+    st.rerun()
+
+st.sidebar.markdown("---")
+
+st.title(T["title"])
 
 # --- Data Loading and Preparation ---
 
@@ -197,18 +235,6 @@ if df is not None:
 
     if filtered_out > 0:
         st.info(f"Info: Kassenbons ({filtered_out}) wurden herausgefiltert. Entweder hatten sie keinen Gesamtpreis oder keine Artikel. Kassenbons vor Februar 2023 sind möglicherweise betroffen.")
-
-    # --- Streamlit Dashboard ---
-    st.set_page_config(layout="wide", page_title=T["page_title"], page_icon="🛒")
-
-    # Custom CSS for better styling
-    st.markdown("""
-    <style>
-    .main .block-container {padding-top: 2rem;}
-    .metric-card {background-color: #f0f2f6; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #1f77b4;}
-    </style>
-    """, unsafe_allow_html=True)
-    st.title(T["title"])
 
     # --- Sidebar for Filters ---
     st.sidebar.header(T["account_filter_header"])
