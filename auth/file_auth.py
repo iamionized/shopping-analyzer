@@ -53,12 +53,13 @@ def load_cookies_from_file(file_path: Optional[str] = None) -> Optional[requests
         # Create a requests session
         session = requests.Session()
         
-        # Add cookies to session
+	# Add cookies to session
         cookie_count = 0
+        expected_domain = LidlConfig.get_cookie_domain() # Holt sich automatisch lidl.de oder lidl.nl
+        
         for cookie_data in cookies_list:
-            # Skip cookies not for lidl.de domain
             domain = cookie_data.get('domain', '')
-            if 'lidl.de' not in domain:
+            if expected_domain not in domain:
                 continue
             
             # Create cookie with available fields
@@ -75,7 +76,7 @@ def load_cookies_from_file(file_path: Optional[str] = None) -> Optional[requests
             cookie_count += 1
         
         if cookie_count == 0:
-            print("✗ Keine Cookies für lidl.de in der Datei gefunden.")
+            print("✗ Keine Cookies für {expected_domain} in der Datei gefunden.")
             return None
         
         print(f"✓ Erfolgreich {cookie_count} Cookies aus Datei geladen")

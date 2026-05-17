@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  shopping-analyzer:
+    build: .
+    container_name: shopping-analyzer
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./:/app

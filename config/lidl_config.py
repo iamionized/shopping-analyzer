@@ -1,15 +1,15 @@
 """Configuration constants for Lidl API integration."""
 
-
 class LidlConfig:
     """Configuration constants for Lidl API integration."""
 
-    # File paths
-    RECEIPTS_JSON_FILE = "lidl_receipts.json"
-    COOKIES_JSON_FILE = "lidl_cookies.json"
-
-    # Country settings (can be changed via set_country)
+    # Country and Account settings
     COUNTRY = "de"
+    ACCOUNT = "main"
+
+    # File paths
+    RECEIPTS_JSON_FILE = f"lidl_receipts_{COUNTRY}_{ACCOUNT}.json"
+    COOKIES_JSON_FILE = f"lidl_cookies_{COUNTRY}_{ACCOUNT}.json"
 
     # Request settings
     DEFAULT_TIMEOUT = 15
@@ -53,11 +53,20 @@ class LidlConfig:
         return f"lidl.{cls.COUNTRY}"
 
     @classmethod
-    def set_country(cls, country: str) -> None:
-        """
-        Set the country and update all derived settings.
+    def _update_file_paths(cls) -> None:
+        cls.RECEIPTS_JSON_FILE = f"lidl_receipts_{cls.COUNTRY}_{cls.ACCOUNT}.json"
+        cls.COOKIES_JSON_FILE = f"lidl_cookies_{cls.COUNTRY}_{cls.ACCOUNT}.json"
 
-        Args:
-            country: Two-letter country code (e.g., 'de', 'bg', 'nl')
-        """
-        cls.COUNTRY = country.lower()
+    @classmethod
+    def set_country(cls, country: str) -> None:
+        """Set the country and update all derived settings."""
+        if country:
+            cls.COUNTRY = country.lower()
+        cls._update_file_paths()
+
+    @classmethod
+    def set_account(cls, account: str) -> None:
+        """Set the account and update all derived settings."""
+        if account:
+            cls.ACCOUNT = account.lower()
+        cls._update_file_paths()

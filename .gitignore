@@ -1,4 +1,7 @@
 venv/
 __pycache__/
 lidl_receipts.json
-lidl_cookies.json
+lidl_cookies.json*.json
+*.log
+*.json
+commands.txt

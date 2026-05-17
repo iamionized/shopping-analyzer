@@ -20,7 +20,6 @@ from cli import main
 from config import LidlConfig
 from workflows import initial_setup, update_data
 
-
 def create_parser() -> argparse.ArgumentParser:
     """Create the argument parser with subcommands."""
     parser = argparse.ArgumentParser(
@@ -47,6 +46,12 @@ def create_parser() -> argparse.ArgumentParser:
             metavar="CODE",
             help="Two-letter country code (e.g., 'de', 'bg', 'nl'). Default: de",
         )
+        subparser.add_argument(
+            "--account",
+            metavar="NAME",
+            default="main",
+            help="Account name (e.g., 'ruben', 'sarah'). Default: main",
+        )
 
     # Initial setup subcommand
     initial_parser = subparsers.add_parser(
@@ -64,12 +69,14 @@ def create_parser() -> argparse.ArgumentParser:
 
     return parser
 
-
 def run_workflow(args: argparse.Namespace, workflow_func) -> bool:
     """Run a workflow with the appropriate auth method."""
     # Set country if provided
     if args.country:
         LidlConfig.set_country(args.country)
+        
+    if hasattr(args, 'account') and args.account:
+        LidlConfig.set_account(args.account)
 
     if args.browser:
         return workflow_func(auth_method=args.browser)
@@ -78,7 +85,6 @@ def run_workflow(args: argparse.Namespace, workflow_func) -> bool:
     else:
         # Interactive mode
         return workflow_func()
-
 
 if __name__ == "__main__":
     parser = create_parser()
