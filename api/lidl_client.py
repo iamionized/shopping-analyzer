@@ -2,7 +2,7 @@
 
 import json
 from typing import Optional, Dict, Any
-import requests
+from curl_cffi import requests
 
 from config import LidlConfig
 from parsing import parse_receipt_html

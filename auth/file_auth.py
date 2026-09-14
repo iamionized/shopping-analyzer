@@ -3,7 +3,7 @@
 import os
 import json
 from typing import Optional
-import requests
+from curl_cffi import requests
 
 from config import LidlConfig
 
@@ -51,7 +51,7 @@ def load_cookies_from_file(file_path: Optional[str] = None) -> Optional[requests
             return None
         
         # Create a requests session
-        session = requests.Session()
+        session = requests.Session(impersonate="chrome")
         
 	# Add cookies to session
         cookie_count = 0
@@ -62,16 +62,13 @@ def load_cookies_from_file(file_path: Optional[str] = None) -> Optional[requests
             if expected_domain not in domain:
                 continue
             
-            # Create cookie with available fields
-            session.cookies.set_cookie(
-                requests.cookies.create_cookie(
-                    domain=cookie_data.get('domain', ''),
-                    name=cookie_data.get('name', ''),
-                    value=cookie_data.get('value', ''),
-                    path=cookie_data.get('path', '/'),
-                    secure=cookie_data.get('secure', False),
-                    expires=cookie_data.get('expirationDate', None),
-                )
+            # Set cookie directly into the impersonated session
+            session.cookies.set(
+                name=cookie_data.get('name', ''),
+                value=cookie_data.get('value', ''),
+                domain=cookie_data.get('domain', ''),
+                path=cookie_data.get('path', '/'),
+                secure=cookie_data.get('secure', False),
             )
             cookie_count += 1
         
