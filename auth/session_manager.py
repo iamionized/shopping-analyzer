@@ -5,9 +5,9 @@ from typing import Optional
 import requests
 
 from config import LidlConfig
-from cli.prompts import select_auth_method
 from .file_auth import load_cookies_from_file
 from .browser_auth import extract_browser_cookies
+
 
 
 def setup_and_test_session(
@@ -28,6 +28,7 @@ def setup_and_test_session(
     """
     # Use provided auth_method or prompt user interactively
     if auth_method is None:
+        from cli.prompts import select_auth_method
         auth_method = select_auth_method()
 
     # Extract cookies based on selected method

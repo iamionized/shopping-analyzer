@@ -2,15 +2,21 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install dependencies
+# Install python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Playwright Chromium browser and its system dependencies
+RUN playwright install --with-deps chromium
 
 # Copy the rest of the application
 COPY . .
 
+# Ensure entrypoint script is executable
+RUN chmod +x entrypoint.sh
+
 # Expose Streamlit default port
 EXPOSE 8501
 
-# Run the Streamlit dashboard and set the base URL path to match your Nginx setup
-CMD ["streamlit", "run", "dashboard.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.baseUrlPath=/shopping-analyzer"]
+# Run entrypoint script which starts both background scheduler and Streamlit dashboard
+ENTRYPOINT ["/app/entrypoint.sh"]

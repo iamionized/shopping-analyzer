@@ -4,4 +4,9 @@ lidl_receipts.json
 lidl_cookies.json*.json
 *.log
 *.json
+!accounts.example.json
+accounts.json
+.env
 commands.txt
+*.backup
+test_playwright.py

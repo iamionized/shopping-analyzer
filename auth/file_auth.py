@@ -73,7 +73,7 @@ def load_cookies_from_file(file_path: Optional[str] = None) -> Optional[requests
             cookie_count += 1
         
         if cookie_count == 0:
-            print("✗ Keine Cookies für {expected_domain} in der Datei gefunden.")
+            print(f"✗ Keine Cookies für {expected_domain} in der Datei gefunden.")
             return None
         
         print(f"✓ Erfolgreich {cookie_count} Cookies aus Datei geladen")
